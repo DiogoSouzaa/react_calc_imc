@@ -1,21 +1,29 @@
 import { useState } from 'react';
 import styles from './App.module.css';
 import poweredImage from './Assets/powered.png';
+import leftArrowImage from './Assets/leftarrow.png';
+import {GridItem} from './components/GridItem';
 
 import {levels, calculateImc} from './helpers/imc';
 
 const App = () => {
    const [heightField, setHeightField] = useState(0);
    const [weightField, setWeightField] = useState(0);
-
+   const [toShow, setToShow] = useState(null);
+   
    const handleCalculateButton = () => {
       if (heightField && weightField) {
-
+          setToShow(calculateImc(heightField, weightField))     
       } else {
          alert('Dígite todos os campos.')
       }
    }
 
+   const handleBackButton = () =>{
+      setToShow(null);
+      setHeightField(0);
+      setWeightField(0);
+   }
    return (
     <div className={styles.main}>
       <header>
@@ -32,7 +40,7 @@ const App = () => {
                type='number'
                placeholder='Dígite a sua altura. EX: 1.5 (em métros)'
                value={heightField > 0 ? heightField : ''}
-               onChange={event => setHeightField(parseFloat(event.target.value))}              
+               onChange={event => setHeightField(parseFloat(event.target.value))} disabled={toShow ? true : false}             
             >
             </input>
 
@@ -40,18 +48,32 @@ const App = () => {
                type='number'
                placeholder='Dígite a sua Peso. EX: 75.3 (em Kg)'
                value={weightField > 0 ? weightField: ''}
-               onChange={event => setWeightField(parseFloat(event.target.value))}              
+               onChange={event => setWeightField(parseFloat(event.target.value))} disabled={toShow ? true : false}              
             >
             </input>
 
-            <button onClick={handleCalculateButton}>Calcular</button>
+            <button onClick={handleCalculateButton} disabled={toShow ? true : false}>Calcular</button>
          </div>
          <div className={styles.rightSide}>
-            ...
+         {!toShow &&
+            <div className={styles.grid}>
+               {levels.map((item, key)=> (
+                  <GridItem key={key} item={item}/>
+               ))}
+            </div>
+         }
+         {toShow &&
+           <div className={styles.rightBig}>
+              <div className={styles.rightArrow} onClick={handleBackButton}>
+                <img src={leftArrowImage} alt='' width='25'/>
+              </div>
+              <GridItem item={toShow} />
+           </div>
+         }
          </div>
       </div>
       
-    </div>
+</div>
    )
 }
 
